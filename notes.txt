@@ -1,0 +1,18 @@
+Odyssesus Capabilities
+
+1. Voice Activation(AI)
+    a. Voice to Text and Text to Voice Translation
+    b. Greek or British
+    c. Email Access
+    d. Youtube Access
+    e. File Navigation
+    f. Name Recogniztion
+
+2. Satellite Tracking (API)
+    a. Map API
+    b. Weather AP
+3. System Monitoring (CPU)
+    a. CPU
+    b. Memory
+    c. Battery
+    d. Network
