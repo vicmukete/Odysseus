@@ -18,12 +18,12 @@ current alert
 
 #key
 weather_api_key = os.getenv("WEATHER_API_KEY")
-url = "http://api.weatherapi.com/v1/current.json"
+
 
    
 def get_current_weather(city_name):
-    
 
+    url = "http://api.weatherapi.com/v1/current.json"
     
     query_parameters = {
         "key": weather_api_key,
@@ -37,6 +37,7 @@ def get_current_weather(city_name):
         if response.status_code == 200:
             weather_data = response.json()
             current = weather_data["current"]
+            
 
             feels_like = current["feelslike_f"]
             temperature = current["temp_f"]
@@ -44,8 +45,9 @@ def get_current_weather(city_name):
             description = current["condition"]["text"]
 
 
+
             # Print and Read
-            print(f"\nHere's the weather for {city_name.title()}: ")
+            print(f"\nHere's the current weather for {city_name.title()}: ".title())
             print(f"FEELS LIKE, {feels_like}")
             print(f"TEMPERATURE,  {temperature}")
             print(f"HUMIDITY, {humidity}")
@@ -69,11 +71,14 @@ def get_current_weather(city_name):
 
 def get_forecasted_weather(city_name, num_days):
 
+    url = "http://api.weatherapi.com/v1/forecast.json"
+
     query_parameters = {
             "key": weather_api_key,
             "q": city_name,
             "aqi": "no",
-            "days": num_days
+            "alerts": "yes",
+            "days": num_days            
         }
 
     try:
@@ -81,22 +86,25 @@ def get_forecasted_weather(city_name, num_days):
 
         if response.status_code == 200:
             weather_data = response.json()
-            print(weather_data)
 
             for forecast_day in weather_data["forecast"]["forecastday"]:
                 day_date = forecast_day["date"]
                 day_info = forecast_day["day"]
+                astro_info = forecast_day["astro"]
 
                 max_temp = day_info["maxtemp_f"]
                 min_temp = day_info["mintemp_f"]
                 condition = day_info["condition"]["text"]
                 avg_humidity = day_info["avghumidity"]
+                sunset = astro_info["sunset"]
+                
 
                 print(f"\nDATE, {day_date}")
                 print(f"CONDITION, {condition}")
                 print(f"MAX TEMP, {max_temp}")
                 print(f"MIN_TEMP, {min_temp}")
                 print(f"AVERAGE HUMIDITY, {avg_humidity}")
+                print(f"SUNSET, {sunset}")
 
         else:
             print(f"Error: Unable to fetch data. Status Code:{response.status_code}")
@@ -122,11 +130,14 @@ if __name__ == "__main__":
 # determine how/when to run either current ore forecasted
    
     # city_name query
-    print("Returns T or F if KEY works", load_dotenv())
-
-
     city = input("Enter city name: ")
     days = int(input("Enter nubmer of days: "))
+
+    #determine if key still works
+    #print(load_dotenv())
+
+
+    
 
     get_current_weather(city)
     get_forecasted_weather(city, days)
