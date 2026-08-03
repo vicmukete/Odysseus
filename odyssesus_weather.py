@@ -86,6 +86,7 @@ def get_forecasted_weather(city_name, num_days):
 
         if response.status_code == 200:
             weather_data = response.json()
+            print(f"Here's the forecasted weather for {city_name.title()} for the next {num_days} days: ".title())
 
             for forecast_day in weather_data["forecast"]["forecastday"]:
                 day_date = forecast_day["date"]
