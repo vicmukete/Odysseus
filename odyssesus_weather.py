@@ -1,6 +1,7 @@
 import requests
 import os
 from datetime import timedelta
+import traceback
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -15,18 +16,19 @@ current description
 current alert
 '''
 
+#key
 weather_api_key = os.getenv("WEATHER_API_KEY")
+url = "http://api.weatherapi.com/v1/current.json"
 
    
 def get_current_weather(city_name):
-    # key
-     
-    url = f"http://api.openweathermap.org/data/2.5/forecast?q={city_name}&appid={weather_api_key}"
+    
 
+    
     query_parameters = {
+        "key": weather_api_key,
         "q": city_name,
-        "appid": weather_api_key,
-        "units": "metric"
+        "aqi": "no"
     }    
 
     try:
@@ -34,19 +36,20 @@ def get_current_weather(city_name):
 
         if response.status_code == 200:
             weather_data = response.json()
+            current = weather_data["current"]
 
-            feels_like = weather_data["main"]["feels_like"]
-            temperature = weather_data["main"]["temp"]
-            humidity = weather_data["main"]["humidity"]
-            description = weather_data["main"][0]["description"]
+            feels_like = current["feelslike_f"]
+            temperature = current["temp_f"]
+            humidity = current["humidity"]
+            description = current["condition"]["text"]
 
 
             # Print and Read
-            print(f"Here's the weather for {city_name.title()}: ")
+            print(f"\nHere's the weather for {city_name.title()}: ")
             print(f"FEELS LIKE, {feels_like}")
             print(f"TEMPERATURE,  {temperature}")
             print(f"HUMIDITY, {humidity}")
-            print(f"DESCRIPTION,{description.capitalize()}")
+            print(f"DESCRIPTION, {description.capitalize()}")
             
         else:
             print(f"Error: Unable to fetch data. Status Code:{response.status_code}")
@@ -59,47 +62,37 @@ def get_current_weather(city_name):
         
     except Exception as err:
         print(f"Unkown error occured: {err}")
+        traceback.print_exc()
     
 
 
 
 def get_forecasted_weather(city_name, num_days):
 
-    url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={weather_api_key}"
-
-    querey_parameters = {
-        "q": city_name,
-        "appid": weather_api_key,
-        "units": "metrics",
-        "days": num_days
-    }
-
-    # YYYY-MM-DD
-    today = date.today()
-    tomrrow = date.today() + timedelta(days=1)
-
-    # Could do (requested day - current day)
-    if today:
-        num_days = 1
+    query_parameters = {
+            "key": weather_api_key,
+            "q": city_name,
+            "aqi": "no",
+            "days": num_days
+        }
 
     try:
-        response = requests.get(url, querey_parameters)
+        response = requests.get(url, query_parameters)
 
         if response.status_code == 200:
             weather_data = response.json()
+            print(weather_data)
 
+            for forecast_day in weather_data["forecast"]["forecastday"]:
+                day_date = forecast_day["date"]
+                day_info = forecast_day["day"]
 
-
-            for day in weather_data["list"]:
-                date = day["date"]
-
-                day_info = day["day"]
                 max_temp = day_info["maxtemp_f"]
                 min_temp = day_info["mintemp_f"]
                 condition = day_info["condition"]["text"]
                 avg_humidity = day_info["avghumidity"]
 
-                print(f"DATE, {date}")
+                print(f"\nDATE, {day_date}")
                 print(f"CONDITION, {condition}")
                 print(f"MAX TEMP, {max_temp}")
                 print(f"MIN_TEMP, {min_temp}")
@@ -118,6 +111,8 @@ def get_forecasted_weather(city_name, num_days):
 
     except Exception as err:
         print(f"Unkown error occured: {err}")
+        traceback.print_exc()
+        
 
 
 
@@ -125,15 +120,13 @@ def get_forecasted_weather(city_name, num_days):
 if __name__ == "__main__":
 
 # determine how/when to run either current ore forecasted
-
-
-
-    # Should hold cpu read and interpreted 
-    # value of designated city
    
     # city_name query
+    print("Returns T or F if KEY works", load_dotenv())
+
+
     city = input("Enter city name: ")
     days = int(input("Enter nubmer of days: "))
 
     get_current_weather(city)
-    #get_forecasted_weather(city, days)
+    get_forecasted_weather(city, days)
