@@ -1,6 +1,10 @@
 import requests
 import os
-from datetime import date, datetime, timedelta
+from datetime import timedelta
+
+from dotenv import load_dotenv
+load_dotenv()
+
 
 '''
 present weather stats:
@@ -17,32 +21,24 @@ weather_api_key = os.getenv("WEATHER_API_KEY")
 def get_current_weather(city_name):
     # key
      
-    url = f"http://api.openweathermap.org/data/2.5/weather?q={city_name}&appid={weather_api_key}"
+    url = f"http://api.openweathermap.org/data/2.5/forecast?q={city_name}&appid={weather_api_key}"
 
     query_parameters = {
         "q": city_name,
-        "aapid": weather_api_key,
-        "units": "metric",
-        "alerts": "yes"
+        "appid": weather_api_key,
+        "units": "metric"
     }    
 
     try:
         response = requests.get(url, params=query_parameters)
 
         if response.status_code == 200:
-            weather_data = response.json
+            weather_data = response.json()
+
             feels_like = weather_data["main"]["feels_like"]
             temperature = weather_data["main"]["temp"]
             humidity = weather_data["main"]["humidity"]
-            description = weather_data["main"][0]["Description"]
-
-            # Alert Handler
-            if "alerts" in weather_data and weather_data["alerts"]["alert"]:
-                for alert in weather_data["alerts"]["alert"]:
-                    alert_event = alert.get('event')
-                    alert_severity = alert.get("severity")
-                    alert_note = alert.get("note")
-                print(f"ALERT, {alert_event}")
+            description = weather_data["main"][0]["description"]
 
 
             # Print and Read
@@ -67,13 +63,13 @@ def get_current_weather(city_name):
 
 
 
-def get_forecasted_weather(city_name):
+def get_forecasted_weather(city_name, num_days):
 
     url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={weather_api_key}"
 
     querey_parameters = {
         "q": city_name,
-        "aapid": weather_api_key,
+        "appid": weather_api_key,
         "units": "metrics",
         "days": num_days
     }
@@ -91,8 +87,10 @@ def get_forecasted_weather(city_name):
 
         if response.status_code == 200:
             weather_data = response.json()
-            forecast_days = weather_data["forecast"]["forecastday"]
-            for day in forecast_days:
+
+
+
+            for day in weather_data["list"]:
                 date = day["date"]
 
                 day_info = day["day"]
@@ -100,15 +98,6 @@ def get_forecasted_weather(city_name):
                 min_temp = day_info["mintemp_f"]
                 condition = day_info["condition"]["text"]
                 avg_humidity = day_info["avghumidity"]
-
-                # Alerts
-                if "alerts" in weather_data and weather_data["alerts"]["alert"]:
-                    for alert in weather_data["alerts"]["alert"]:
-                        alert_event = alert.get('event')
-                        alert_severity = alert.get("severity")
-                        alert_note = alert.get("note")
-                    print(f"ALERT, {alert_event}")
-
 
                 print(f"DATE, {date}")
                 print(f"CONDITION, {condition}")
@@ -144,6 +133,7 @@ if __name__ == "__main__":
    
     # city_name query
     city = input("Enter city name: ")
+    days = int(input("Enter nubmer of days: "))
 
     get_current_weather(city)
-    get_forecasted_weather(city)
+    #get_forecasted_weather(city, days)
