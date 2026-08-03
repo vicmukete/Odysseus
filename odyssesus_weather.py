@@ -11,15 +11,17 @@ current description
 current alert
 '''
 
-api_key = os.getenv("API_KEY")
-url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}"
+weather_api_key = os.getenv("WEATHER_API_KEY")
+
    
 def get_current_weather(city_name):
     # key
+     
+    url = f"http://api.openweathermap.org/data/2.5/weather?q={city_name}&appid={weather_api_key}"
 
     query_parameters = {
         "q": city_name,
-        "aapid": api_key,
+        "aapid": weather_api_key,
         "units": "metric",
         "alerts": "yes"
     }    
@@ -67,9 +69,11 @@ def get_current_weather(city_name):
 
 def get_forecasted_weather(city_name):
 
+    url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={weather_api_key}"
+
     querey_parameters = {
         "q": city_name,
-        "aapid": api_key,
+        "aapid": weather_api_key,
         "units": "metrics",
         "days": num_days
     }
@@ -137,7 +141,9 @@ if __name__ == "__main__":
 
     # Should hold cpu read and interpreted 
     # value of designated city
+   
     # city_name query
     city = input("Enter city name: ")
+
     get_current_weather(city)
     get_forecasted_weather(city)
